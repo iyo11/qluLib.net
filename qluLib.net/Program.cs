@@ -14,23 +14,28 @@ var sso = new SSO();
 var library = new Library();
 var url = new QluLibUrl();
 List<string> cookies =[];
-var pastHour = 0;
+var pastHour = -1;
 
 while (true)
 {
-    DateTime now = DateTime.Now;
-    if (now.Hour == 21 && now.Minute == 30 && now.Second == 0)
+    var now = DateTime.Now;
+    switch (now.Hour)
     {
-        cookies = (await sso.GetCookies(userName, passWord, url)).ToList();
-    }
-    if (now.Hour == 22 && now.Minute == 00 && now.Second == 0){
-        if (cookies.Count == 0)
-        {
+        case 21 when now is { Minute: 30, Second: 0 }:
             cookies = (await sso.GetCookies(userName, passWord, url)).ToList();
+            break;
+        case 22 when now is { Minute: 00, Second: 0 }:
+        {
+            if (cookies.Count == 0)
+            {
+                cookies = (await sso.GetCookies(userName, passWord, url)).ToList();
+            }
+            await library.Reserve(url, cookies, areaTime, area, seatId);
+            cookies.Clear();
+            break;
         }
-        await library.Reserve(url, cookies, areaTime, area, seatId);
-        cookies.Clear();
     }
+
     if(now.Hour != pastHour)
     {
         pastHour = now.Hour;
