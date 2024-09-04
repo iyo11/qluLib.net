@@ -12,7 +12,7 @@ public class SSO
             var loginData = await ssoApi.GetSsoLoginData(url);
             await ssoApi.Login(url, ssoUserName, ssoPassword, loginData);
             var cookies = (await ssoApi.GetCookies(url)).ToList();
-            Console.WriteLine($"cookies -> {string.Join(";",cookies)}");
+            Console.WriteLine($"[{ssoUserName}] cookies -> {string.Join(";",cookies)}");
             return cookies;
         }
         catch (Exception e)

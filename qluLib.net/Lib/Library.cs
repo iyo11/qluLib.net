@@ -19,9 +19,9 @@ public class Library
             var libraryApi = new LibraryApi(string.Join(";", enumerable));
             var times = await libraryApi.GetTimeInfo(url);
             var day = areaTime == AreaTime.Today ? times[0] : times[1];
-            Console.WriteLine($"预约时间 -> {day}");
+            Console.WriteLine($"[{userId}] 预约时间 -> {day}");
             var segment = (await libraryApi.GetAreaDays(url, area))[day];
-            Console.WriteLine($"Segment -> {segment}");
+            Console.WriteLine($"[{userId}] Segment -> {segment}");
             var postUrl = NetWorkClient.BuildUrl(
                 string.Format(url.Reserve, (int)seatId),
                 new SortedDictionary<string, string>()
@@ -43,16 +43,16 @@ public class Library
             var message = obj["msg"] ?? "";
             if (status?.ToString() == "1")
             {
-                Console.WriteLine($"{message.ToString().Replace("<br/>","\n")}");
+                Console.WriteLine($"[{userId}] {message.ToString().Replace("<br/>","\n")}");
                 return true;
             }
 
-            Console.WriteLine($"预约失败\n{message}");
+            Console.WriteLine($"[{userId}] 预约失败\n{message}");
             return false;
         }
         catch (Exception e)
         {
-            Console.WriteLine("Unable to reserve");
+            Console.WriteLine($"Unable to reserve");
             Console.WriteLine(e.Message);
             throw;
         }
