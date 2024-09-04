@@ -41,5 +41,5 @@ while (true)
         pastHour = now.Hour;
         Console.WriteLine($"[{now}] {userName} -> {areaTime} > {area} > {seatId}");
     }
-    Task.Delay(500).Wait();
+    Task.Delay(1000).Wait();
 }
