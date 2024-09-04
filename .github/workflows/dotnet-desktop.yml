@@ -1,0 +1,28 @@
+name: Daily Build and Run .NET Console App
+
+on:
+  schedule:
+    - cron: '15 9 * * *'
+
+jobs:
+  build-and-run:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.401'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build application
+      run: dotnet build --configuration Release
+
+    - name: Run application
+      run: |
+        cd out
+        ./qluLib.net.dll
