@@ -38,7 +38,6 @@ public class SsoApi
         var croyptoMath = Regexes.CroyptoRegex().Match(pageString);
         var executionMatch = Regexes.ExecutionRegex().Match(pageString);
         
-        
         return new SsoLoginData
         {
             Cookies = cookies,

@@ -10,12 +10,13 @@ public class Library
 {
     public async Task<bool> Reserve(IUrlBase url, IEnumerable<string> cookies, AreaTime areaTime, Area area, SeatId seatId)
     {
+
         try
         {
             var enumerable = cookies.ToList();
             var userId = enumerable.FirstOrDefault(cookie => cookie.Contains($"userid"))?.Split("=")[1];
             var accessToken = enumerable.FirstOrDefault(cookie => cookie.Contains($"access_token"))?.Split("=")[1];
-
+            Console.WriteLine($"{userId} 开始预约");
             var libraryApi = new LibraryApi(string.Join(";", enumerable));
             var times = await libraryApi.GetTimeInfo(url);
             var day = areaTime == AreaTime.Today ? times[0] : times[1];

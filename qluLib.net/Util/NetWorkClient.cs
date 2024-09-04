@@ -6,16 +6,22 @@ namespace qluLib.net.Util;
 
 public static class NetWorkClient
 {
-    private static readonly HttpClient HttpClient = CreateHttpClient();
-    private static readonly CookieContainer CookieContainer = new CookieContainer();
+    private static HttpClient _httpClient = CreateHttpClient();
+    private static CookieContainer _cookieContainer = new();
     private static HttpClient CreateHttpClient()
     {
         var socketsHttpHandler = new SocketsHttpHandler() 
         {
             ConnectTimeout = TimeSpan.FromSeconds(3),
-            CookieContainer = CookieContainer
+            CookieContainer = _cookieContainer
         };
         return new HttpClient(socketsHttpHandler);
+    }
+
+    public static void InitHttpClient()
+    {
+        _cookieContainer = new CookieContainer();
+        _httpClient = CreateHttpClient();
     }
     
     public static async Task<IEnumerable<Cookie>> GetCookies(string url)
@@ -40,6 +46,7 @@ public static class NetWorkClient
 
     public static async Task<List<string>> GetCookiesAsString(string url) => (await GetCookies(url)).Select(cookie => cookie.ToString()).ToList();
     
+    
     public static async ValueTask<HttpResponseMessage> GetAsync(string url,Dictionary<string, string> headers = null)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, url);
@@ -50,12 +57,10 @@ public static class NetWorkClient
                 request.Headers.Add(keyValuePair.Key, keyValuePair.Value);
             }
         }
-        var response = await HttpClient.SendAsync(request);
-        if (!response.IsSuccessStatusCode) return response;
-        var cookies = CookieContainer.GetCookies(new Uri(url));
-        foreach (Cookie cookie in cookies)
+        var response = await _httpClient.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
         {
-            Console.WriteLine(cookie);
+            throw new HttpRequestException($"Request failed with status code {response.StatusCode}.");
         }
         return response;
     }
@@ -78,7 +83,7 @@ public static class NetWorkClient
        {
            request.Content = content;
        }
-       var response = await HttpClient.SendAsync(request);
+       var response = await _httpClient.SendAsync(request);
        if (!response.IsSuccessStatusCode)
        {
            throw new HttpRequestException($"Request failed with status code {response.StatusCode}.");

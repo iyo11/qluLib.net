@@ -1,4 +1,5 @@
 ﻿using qluLib.net.Url;
+using qluLib.net.Util;
 
 namespace qluLib.net.Sso;
 
@@ -8,6 +9,7 @@ public class SSO
     {
         try
         {
+            NetWorkClient.InitHttpClient();
             var ssoApi = new SsoApi();
             var loginData = await ssoApi.GetSsoLoginData(url);
             await ssoApi.Login(url, ssoUserName, ssoPassword, loginData);

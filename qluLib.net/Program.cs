@@ -53,6 +53,7 @@ while (true)
                 }
                 tasks.Add(library.Reserve(url, user.Cookies, user.AreaTime, user.Area, user.SeatId));
             }
+
             await Task.WhenAll(tasks);
             break;
         }
