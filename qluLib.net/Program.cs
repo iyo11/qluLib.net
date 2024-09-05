@@ -2,8 +2,9 @@
 using qluLib.net.Lib;
 using qluLib.net.Sso;
 using qluLib.net.Url;
+using qluLib.net.Util;
 
-
+//配置
 var user1 = new SsoUserProfile()
 {
     Username = "",
@@ -20,17 +21,17 @@ var user2 = new SsoUserProfile()
     Area = Area.六楼东, 
     SeatId = SeatId.六楼东002
 };
-
 var users = new List<SsoUserProfile>
 {
     user1,user2
 };
 
+//预约
 var sso = new SSO();
 var library = new Library();
 var url = new QluLibUrl();
 var pastHour = -1;
-
+Banner.Print();
 while (true)
 {
     var now = DateTime.Now;
