@@ -10,16 +10,16 @@ var user1 = new SsoUserProfile()
     Username = "",
     Password = "",
     AreaTime = AreaTime.Tomorrow, 
-    Area = Area.六楼东, 
-    SeatId = SeatId.六楼东001
+    Area = Area.二楼西, 
+    SeatId = SeatId.二楼西001
 };
 var user2 = new SsoUserProfile()
 {
     Username = "",
     Password = "",
     AreaTime = AreaTime.Tomorrow, 
-    Area = Area.六楼东, 
-    SeatId = SeatId.六楼东002
+    Area = Area.二楼西, 
+    SeatId = SeatId.二楼西002
 };
 var users = new List<SsoUserProfile>
 {
@@ -31,14 +31,30 @@ var sso = new SSO();
 var library = new Library();
 var url = new QluLibUrl();
 var pastHour = -1;
+var now = DateTime.Now;
 Banner.Print();
+
+foreach (var user in users)
+{
+    if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password))
+    {
+        Console.WriteLine($"[{now}] -> 无效的用户");
+        continue;
+    }
+    if (!library.VerifyAreaSeat(user.Area, user.SeatId))
+    {
+        Console.WriteLine($"[{now}] -> {user.Username} > 区域{user.Area}不存在座位{user.SeatId}");
+        continue;
+    }
+    user.Verified = true;
+}
+
 while (true)
 {
-    var now = DateTime.Now;
     switch (now.Hour)
     {
         case 21 when now is { Minute: 30, Second: 0 }:
-            foreach (var user in users)
+            foreach (var user in users.Where(user => user.Verified))
             {
                 user.Cookies = (await sso.GetCookies(user.Username, user.Password, url)).ToList();
             }
@@ -46,7 +62,7 @@ while (true)
         case 22 when now is { Minute: 00, Second: 0 }:
         {
             var tasks = new List<Task<bool>>();
-            foreach (var user in users)
+            foreach (var user in users.Where(user => user.Verified))
             {
                 while (user.Cookies is null || user.Cookies.Count == 0)
                 {
@@ -61,10 +77,10 @@ while (true)
     }
     if(now.Hour != pastHour)
     {
-        foreach (var user in users)
+        pastHour = now.Hour;
+        foreach (var user in users.Where(user => user.Verified))
         {
-            pastHour = now.Hour;
-            Console.WriteLine($"[{now}] {user.Username} -> {user.AreaTime} > {user.Area} > {user.SeatId}"); 
+            Console.WriteLine($"[{now}] {user.Username} -> {user.AreaTime} > {user.Area} > {user.SeatId}");
         }
     }
     Task.Delay(1000).Wait();

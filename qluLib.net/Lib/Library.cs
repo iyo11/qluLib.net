@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 using qluLib.net.Enums;
 using qluLib.net.Sso;
 using qluLib.net.Url;
@@ -8,9 +9,10 @@ namespace qluLib.net.Lib;
 
 public class Library
 {
+    public bool VerifyAreaSeat(Area area,SeatId seatId) => seatId.ToString().Contains(area.ToString());
+    
     public async Task<bool> Reserve(IUrlBase url, IEnumerable<string> cookies, AreaTime areaTime, Area area, SeatId seatId)
     {
-
         try
         {
             var enumerable = cookies.ToList();
