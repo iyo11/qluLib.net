@@ -4,6 +4,7 @@ using qluLib.net.Sso;
 using qluLib.net.Url;
 using qluLib.net.Util;
 
+
 //配置
 var user1 = new SsoUserProfile()
 {
