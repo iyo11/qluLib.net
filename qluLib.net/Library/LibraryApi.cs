@@ -3,7 +3,7 @@ using qluLib.net.Enums;
 using qluLib.net.Url;
 using qluLib.net.Util;
 
-namespace qluLib.net.Lib;
+namespace qluLib.net.Library;
 
 public class LibraryApi(string cookie)
 {
@@ -29,7 +29,7 @@ public class LibraryApi(string cookie)
     {
         List<string> list = [];
         var response = await NetWorkClient.GetAsync(url.TimeInfo,Headers);
-        if (!response.IsSuccessStatusCode) return [];
+        if (response is null || !response.IsSuccessStatusCode) return [];
         var jObject = JObject.Parse(await response.Content.ReadAsStringAsync());
         if (jObject["data"]?["list"] is not JArray jArray) return [];
         list.AddRange(jArray.Select(jToken => jToken["day"]?["date"]?.ToString().Split(" ")[0]));
@@ -40,7 +40,7 @@ public class LibraryApi(string cookie)
     {
         Dictionary<string, string> areaDays = [];
         var response = await NetWorkClient.GetAsync(string.Format(url.AreaDaysSegInfo,(int)areaId),Headers);
-        if (!response.IsSuccessStatusCode) return [];
+        if (response is null || !response.IsSuccessStatusCode) return [];
         var jObject = JObject.Parse(await response.Content.ReadAsStringAsync());
         if (jObject["data"]?["list"] is not JArray jArray) return [];
         foreach (var jToken in jArray)
@@ -53,7 +53,7 @@ public class LibraryApi(string cookie)
         return areaDays;
     }
     
-    public async Task<Dictionary<string,AreaStatus>> GetAreaSeatStatus(IUrlBase url,Area areaId,string day)
+    public async Task<Dictionary<string,SeatStatus>> GetAreaSeatStatus(IUrlBase url,Area areaId,string day)
     {
         var getUrl = NetWorkClient.BuildUrl(
             url.AreaReservationInfo, new SortedDictionary<string, string>()
@@ -64,19 +64,19 @@ public class LibraryApi(string cookie)
                 { "endTime","22:00" },
             });
         var response = await NetWorkClient.GetAsync(string.Format(getUrl,(int)areaId),Headers);
-        if (!response.IsSuccessStatusCode) return [];
+        if (response is null || !response.IsSuccessStatusCode) return [];
         var jObject = JObject.Parse(await response.Content.ReadAsStringAsync());
         if (jObject["data"]?["list"] is not JArray jArray) return [];
-        var dictionary = new Dictionary<string, AreaStatus>();
+        var dictionary = new Dictionary<string, SeatStatus>();
         foreach (var jToken in jArray)
         {
             if (jToken["id"]?.ToString() is not { } id) continue;
             var status = jToken["status"]?.ToString() switch
             {
-                "1" => AreaStatus.Free,
-                "6" => AreaStatus.Using,
-                "2" => AreaStatus.Reserved,
-                _ => AreaStatus.Free
+                "1" => SeatStatus.Free,
+                "6" => SeatStatus.Using,
+                "2" => SeatStatus.Reserved,
+                _ => SeatStatus.Using
             };
             dictionary.Add(id,status);
         }

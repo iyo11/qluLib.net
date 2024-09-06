@@ -1,5 +1,5 @@
 ﻿using qluLib.net.Enums;
-using qluLib.net.Lib;
+using qluLib.net.Library;
 using qluLib.net.Sso;
 using qluLib.net.Url;
 using qluLib.net.Util;
@@ -32,22 +32,8 @@ var library = new Library();
 var url = new QluLibUrl();
 var pastHour = -1;
 var now = DateTime.Now;
-Banner.Print();
 
-foreach (var user in users)
-{
-    if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password))
-    {
-        Console.WriteLine($"[{now}] -> 无效的用户");
-        continue;
-    }
-    if (!library.VerifyAreaSeat(user.Area, user.SeatId))
-    {
-        Console.WriteLine($"[{now}] -> {user.Username} > 区域{user.Area}不存在座位{user.SeatId}");
-        continue;
-    }
-    user.Verified = true;
-}
+Banner.Print();
 
 while (true)
 {
@@ -78,9 +64,32 @@ while (true)
     if(now.Hour != pastHour)
     {
         pastHour = now.Hour;
-        foreach (var user in users.Where(user => user.Verified))
+        foreach (var user in users)
         {
-            Console.WriteLine($"[{now}] {user.Username} -> {user.AreaTime} > {user.Area} > {user.SeatId}");
+            if (user.Verified)
+            {
+                Console.WriteLine($"[{now}] [{user.Username}] [Listing..] {user.AreaTime} > {user.Area} > {user.SeatId}");
+                break;
+            }
+            if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password))
+            {
+                Console.WriteLine($"[{now}] 用户名或密码为空");
+                continue;
+            }
+            if (!library.VerifyAreaSeat(user.Area, user.SeatId))
+            {
+                Console.WriteLine($"[{now}] [{user.Username}] > 区域{user.Area}不存在座位{user.SeatId}");
+                continue;
+            }
+
+            var cookies = await sso.GetCookies(user.Username, user.Password, url);
+            if (!cookies.Any())
+            {
+                Console.WriteLine($"[{now}] [{user.Username}] > 账号验证失败,将在1小时后重新验证");
+                continue;
+            }
+            Console.WriteLine($"[{now}] [{user.Username}] [Listing..] {user.AreaTime} > {user.Area} > {user.SeatId}");
+            user.Verified = true;
         }
     }
     Task.Delay(1000).Wait();

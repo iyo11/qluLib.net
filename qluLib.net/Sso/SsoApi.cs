@@ -18,7 +18,7 @@ public class SsoLoginData
 
 public class SsoApi
 {
-    public async Task<SsoLoginData> GetSsoLoginData(IUrlBase urlBase)
+    public async Task<SsoLoginData> GetSsoLoginData(IUrlBase urlBase,String username)
     {
         var cookieContainer = new CookieContainer();
         var socketsHttpHandler = new SocketsHttpHandler
@@ -28,12 +28,14 @@ public class SsoApi
         };
         var httpClient = new HttpClient(socketsHttpHandler);
         var uri = new Uri(urlBase.Sso);
+        Console.WriteLine($"[{TimeDate.Now}] [{username}] [SsoApi] Obtaining SessionId");
         var response = await httpClient.GetAsync(uri);
         if (!response.IsSuccessStatusCode)
         {
-            Console.WriteLine("Failed to get SsoLoginData");
+            Console.WriteLine($"[{TimeDate.Now}] [{username}] [SsoApi] Failed to get SsoLoginData");
         }
         var cookies = cookieContainer.GetCookies(uri).ToList();
+        Console.WriteLine($"[{TimeDate.Now}] [{username}] [SsoApi] Successfully obtained SessionId");
         var pageString = await response.Content.ReadAsStringAsync();
         var croyptoMath = Regexes.CroyptoRegex().Match(pageString);
         var executionMatch = Regexes.ExecutionRegex().Match(pageString);
@@ -68,22 +70,25 @@ public class SsoApi
             { "captcha_code","" },
         };
         var httpContent = new FormUrlEncodedContent(data);
-        
         return await NetWorkClient.PostAsync(url.Sso,httpContent,headers);
     }
 
-    public async Task<IEnumerable<string>> GetCookies(IUrlBase url)
+    public async Task<IEnumerable<string>> GetCookies(IUrlBase url,string username)
     {
+        Console.WriteLine($"[{TimeDate.Now}] [{username}] [SsoApi] Obtaining cookies part[1]");
         var response = await NetWorkClient.GetAsync(url.FirstCookie);
-        if (!response.IsSuccessStatusCode) return [];
+        if (response is null || !response.IsSuccessStatusCode) return [];
+        Console.WriteLine($"[{TimeDate.Now}] [{username}] [SsoApi] Successfully obtained cookies part[1]");
         var cookies = response.Headers.GetValues("Set-Cookie")
             .Select(cookie => cookie.Split(';')[0])
             .ToList();
+        Console.WriteLine($"[{TimeDate.Now}] [{username}] [SsoApi] Obtaining cookies part[2]");
         cookies.AddRange(await NetWorkClient.GetCookiesAsString(url.SecondCookie));
+        Console.WriteLine($"[{TimeDate.Now}] [{username}] [SsoApi] Successfully obtained cookies part[2]");
         return cookies;
     }
 
-    public async Task<string> GetCookiesAsString(IUrlBase url) => string.Join(";", await GetCookies(url));
+    public async Task<string> GetCookiesAsString(IUrlBase url,string username) => string.Join(";", await GetCookies(url,username));
     
     
 }

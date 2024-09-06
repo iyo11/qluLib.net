@@ -12,7 +12,7 @@ public static class NetWorkClient
     {
         var socketsHttpHandler = new SocketsHttpHandler() 
         {
-            ConnectTimeout = TimeSpan.FromSeconds(3),
+            ConnectTimeout = TimeSpan.FromSeconds(60),
             CookieContainer = _cookieContainer
         };
         return new HttpClient(socketsHttpHandler);
@@ -29,19 +29,33 @@ public static class NetWorkClient
         var cookieContainer = new CookieContainer();
         var socketsHttpHandler = new SocketsHttpHandler
         {
-            ConnectTimeout = TimeSpan.FromSeconds(3),
+            ConnectTimeout = TimeSpan.FromSeconds(60),
             CookieContainer = cookieContainer
         };
         var httpClient = new HttpClient(socketsHttpHandler);
         var uri = new Uri(url);
-        var response = await httpClient.GetAsync(uri);
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            Console.WriteLine("Failed to get cookies");
-            return [];
+            var response = await httpClient.GetAsync(uri);
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] Request failed with status code {response.StatusCode}.");
+                return [];
+            }
+
+            var cookies = cookieContainer.GetCookies(uri).ToList();
+            return cookies;
         }
-        var cookies = cookieContainer.GetCookies(uri).ToList();
-        return cookies;
+        catch (TimeoutException e)
+        {
+            Console.WriteLine($"{url} timed out");
+            Console.WriteLine(e.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] [GetCookiesException] {e}");
+        }
+        return [];
     }
 
     public static async Task<List<string>> GetCookiesAsString(string url) => (await GetCookies(url)).Select(cookie => cookie.ToString()).ToList();
@@ -57,12 +71,20 @@ public static class NetWorkClient
                 request.Headers.Add(keyValuePair.Key, keyValuePair.Value);
             }
         }
-        var response = await _httpClient.SendAsync(request);
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            throw new HttpRequestException($"Request failed with status code {response.StatusCode}.");
+            var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] Request failed with status code {response.StatusCode}.");
+            }
+            return response;
         }
-        return response;
+        catch (Exception e)
+        {
+            Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] [GetException] {e}");
+            return null;
+        }
     }
     
     public static async ValueTask<HttpResponseMessage> PostAsync(
@@ -83,12 +105,21 @@ public static class NetWorkClient
        {
            request.Content = content;
        }
-       var response = await _httpClient.SendAsync(request);
-       if (!response.IsSuccessStatusCode)
+
+       try
        {
-           throw new HttpRequestException($"Request failed with status code {response.StatusCode}.");
+           var response = await _httpClient.SendAsync(request);
+           if (!response.IsSuccessStatusCode)
+           {
+               Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] Request failed with status code {response.StatusCode}.");
+           }
+           return response;
        }
-       return response;
+       catch (Exception e)
+       {
+           Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] [PostException] {e}");
+           return null;
+       }
     }
     
     public static string BuildUrl(string url, SortedDictionary<string, string> dic)

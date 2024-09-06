@@ -11,17 +11,27 @@ public class SSO
         {
             NetWorkClient.InitHttpClient();
             var ssoApi = new SsoApi();
-            var loginData = await ssoApi.GetSsoLoginData(url);
-            await ssoApi.Login(url, ssoUserName, ssoPassword, loginData);
-            var cookies = (await ssoApi.GetCookies(url)).ToList();
-            Console.WriteLine($"[{ssoUserName}] cookies -> {string.Join(";",cookies)}");
+            var loginData = await ssoApi.GetSsoLoginData(url,ssoUserName);
+            Console.WriteLine($"[{DateTime.Now}] [{ssoUserName}] [SSO] Successfully obtained SsoLoginData");
+            var response = await ssoApi.Login(url, ssoUserName, ssoPassword, loginData);
+            Console.WriteLine($"[{DateTime.Now}] [{ssoUserName}] [SSO] Unified pass login successful");
+            if (response is null || !response.IsSuccessStatusCode)
+            {
+                return [];
+            }
+            Console.WriteLine($"[{DateTime.Now}] [{ssoUserName}] [SSO] Obtaining Cookies");
+            var cookies = (await ssoApi.GetCookies(url,ssoUserName)).ToList();
+            Console.WriteLine($"[{DateTime.Now}] [{ssoUserName}] [SSO] Successfully obtained Cookies");
+            if (cookies.Count != 0)
+            {
+                Console.WriteLine($"[{TimeDate.Now}] [{ssoUserName}] [SSO] Cookies={string.Join(";",cookies)}");
+            }
             return cookies;
         }
         catch (Exception e)
         {
-            Console.WriteLine("Unable to get cookies");
-            Console.WriteLine(e.Message);
-            throw;
+            Console.WriteLine($"[{TimeDate.Now}] [SSO] [GetCookiesException] {e.Message}");
+            return [];
         }
     }
 }

@@ -16,7 +16,7 @@ public enum Area
     机房 = 24
 }
 
-public enum AreaStatus
+public enum SeatStatus
 {
     Free = 1,
     Using = 6,
