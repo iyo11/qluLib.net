@@ -10,6 +10,6 @@ public class SsoUserProfile
     public AreaTime AreaTime { get; set; }
     public SeatId SeatId { get; set; }
     public List<string> Cookies { get; set; }
-    public bool Verified { get; set; }
+    public bool Verified { get; set; } = false;
 }
 

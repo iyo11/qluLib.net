@@ -31,12 +31,10 @@ var sso = new SSO();
 var library = new Library();
 var url = new QluLibUrl();
 var pastHour = -1;
-var now = DateTime.Now;
-
 Banner.Print();
-
 while (true)
 {
+    var now = DateTime.Now;
     switch (now.Hour)
     {
         case 21 when now is { Minute: 30, Second: 0 }:
@@ -56,7 +54,6 @@ while (true)
                 }
                 tasks.Add(library.Reserve(url, user.Cookies, user.AreaTime, user.Area, user.SeatId));
             }
-
             await Task.WhenAll(tasks);
             break;
         }
@@ -66,29 +63,27 @@ while (true)
         pastHour = now.Hour;
         foreach (var user in users)
         {
-            if (user.Verified)
+            if (!user.Verified)
             {
-                Console.WriteLine($"[{now}] [{user.Username}] [Listing..] {user.AreaTime} > {user.Area} > {user.SeatId}");
-                continue;
-            }
-            if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password))
-            {
-                Console.WriteLine($"[{now}] 用户名或密码为空");
-                continue;
-            }
-            if (!library.VerifyAreaSeat(user.Area, user.SeatId))
-            {
-                Console.WriteLine($"[{now}] [{user.Username}] > 区域{user.Area}不存在座位{user.SeatId}");
-                continue;
-            }
-            var cookies = await sso.GetCookies(user.Username, user.Password, url);
-            if (!cookies.Any())
-            {
-                Console.WriteLine($"[{now}] [{user.Username}] > 账号验证失败,将在1小时后重新验证");
-                continue;
+                if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password))
+                {
+                    Console.WriteLine($"[{now}] 用户名或密码为空");
+                    continue;
+                }
+                if (!library.VerifyAreaSeat(user.Area, user.SeatId))
+                {
+                    Console.WriteLine($"[{now}] [{user.Username}] > 区域{user.Area}不存在座位{user.SeatId}");
+                    continue;
+                }
+                var cookies = await sso.GetCookies(user.Username, user.Password, url);
+                if (!cookies.Any())
+                {
+                    Console.WriteLine($"[{now}] [{user.Username}] > 账号验证失败,将在1小时后重新验证");
+                    continue;
+                }
+                user.Verified = true;
             }
             Console.WriteLine($"[{now}] [{user.Username}] [Listing..] {user.AreaTime} > {user.Area} > {user.SeatId}");
-            user.Verified = true;
         }
     }
     Task.Delay(1000).Wait();
