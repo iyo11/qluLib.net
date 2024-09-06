@@ -69,7 +69,7 @@ while (true)
             if (user.Verified)
             {
                 Console.WriteLine($"[{now}] [{user.Username}] [Listing..] {user.AreaTime} > {user.Area} > {user.SeatId}");
-                break;
+                continue;
             }
             if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password))
             {
@@ -81,7 +81,6 @@ while (true)
                 Console.WriteLine($"[{now}] [{user.Username}] > 区域{user.Area}不存在座位{user.SeatId}");
                 continue;
             }
-
             var cookies = await sso.GetCookies(user.Username, user.Password, url);
             if (!cookies.Any())
             {
