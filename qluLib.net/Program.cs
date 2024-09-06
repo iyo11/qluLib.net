@@ -83,7 +83,7 @@ while (true)
                 }
                 user.Verified = true;
             }
-            Console.WriteLine($"[{now}] [{user.Username}] [Listing..] {user.AreaTime} > {user.Area} > {user.SeatId}");
+            Console.WriteLine($"[{now}] [{user.Username}] [Listen..] {user.AreaTime} > {user.Area} > {user.SeatId}");
         }
     }
     Task.Delay(1000).Wait();
