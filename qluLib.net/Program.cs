@@ -62,7 +62,7 @@ while (true)
                 user.Cookies = (await sso.GetCookies(user.Username, user.Password, url)).ToList();
             }
             break;
-        case 12 when now is { Minute: 30, Second: 0 }:
+        case 22 when now is { Minute: 00, Second: 0 }:
         {
             var tasks = new List<Task<Tuple<string, bool>>>();
             foreach (var user in users.Where(user => user.Verified))
