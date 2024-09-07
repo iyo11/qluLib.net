@@ -1,6 +1,6 @@
 # qluLib.net
 
-[qluLib.net](https://github.com/iyo11/qluLib.net)，C#开发的齐鲁工业大学图书馆自动预约程序
+[qluLib.net](https://github.com/iyo11/qluLib.net)，.net8开发的齐鲁工业大学图书馆自动预约程序
 
 ---
 
