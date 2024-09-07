@@ -12,4 +12,3 @@ public class SsoUserProfile
     public List<string> Cookies { get; set; }
     public bool Verified { get; set; } = false;
 }
-

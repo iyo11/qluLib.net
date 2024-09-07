@@ -9,6 +9,6 @@ public interface IUrlBase
     public string TimeInfo { get; }
     public string AreaDaysSegInfo { get; }
     public string AreaReservationInfo { get; }
-    public string Reserve { get;  }
+    public string Reserve { get; }
     public string Refer { get; }
 }

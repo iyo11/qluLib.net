@@ -11,21 +11,15 @@ public class Sso
         {
             NetWorkClient.InitHttpClient();
             var ssoApi = new SsoApi();
-            var loginData = await ssoApi.GetSsoLoginData(url,ssoUserName);
+            var loginData = await ssoApi.GetSsoLoginData(url, ssoUserName);
             Log.Info($"[{ssoUserName}] Successfully obtained SsoLoginData");
             var response = await ssoApi.Login(url, ssoUserName, ssoPassword, loginData);
             Log.Info($"[{ssoUserName}] Unified pass login successful");
-            if (response is null || !response.IsSuccessStatusCode)
-            {
-                return [];
-            }
+            if (response is null || !response.IsSuccessStatusCode) return [];
             Log.Info($"[{ssoUserName}] Obtaining Cookies");
-            var cookies = (await ssoApi.GetCookies(url,ssoUserName)).ToList();
+            var cookies = (await ssoApi.GetCookies(url, ssoUserName)).ToList();
             Log.Info($"[{ssoUserName}] Successfully obtained Cookies");
-            if (cookies.Count != 0)
-            {
-                Log.Info($"[{ssoUserName}] Cookies={string.Join(";",cookies)}");
-            }
+            if (cookies.Count != 0) Log.Info($"[{ssoUserName}] Cookies={string.Join(";", cookies)}");
             return cookies;
         }
         catch (Exception e)

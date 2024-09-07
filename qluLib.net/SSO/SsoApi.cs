@@ -18,7 +18,7 @@ public class SsoLoginData
 
 public class SsoApi
 {
-    public async Task<SsoLoginData> GetSsoLoginData(IUrlBase urlBase,String username)
+    public async Task<SsoLoginData> GetSsoLoginData(IUrlBase urlBase, string username)
     {
         var cookieContainer = new CookieContainer();
         var socketsHttpHandler = new SocketsHttpHandler
@@ -30,33 +30,29 @@ public class SsoApi
         var uri = new Uri(urlBase.Sso);
         Log.Info($"[{username}] Obtaining SessionId");
         var response = await httpClient.GetAsync(uri);
-        if (!response.IsSuccessStatusCode)
-        {
-            Log.Warn($"[{username}] Failed to get SsoLoginData");
-        }
+        if (!response.IsSuccessStatusCode) Log.Warn($"[{username}] Failed to get SsoLoginData");
         var cookies = cookieContainer.GetCookies(uri).ToList();
         Log.Info($"[{username}] Successfully obtained SessionId");
         var pageString = await response.Content.ReadAsStringAsync();
         var croyptoMath = Regexes.CroyptoRegex().Match(pageString);
         var executionMatch = Regexes.ExecutionRegex().Match(pageString);
-        
+
         return new SsoLoginData
         {
             Cookies = cookies,
             Crypto = croyptoMath.Groups[1].Value,
-            Execution = executionMatch.Groups[1].Value,
+            Execution = executionMatch.Groups[1].Value
         };
-
     }
 
-    public async Task<HttpResponseMessage> Login(IUrlBase url,string username, string password,SsoLoginData loginData)
+    public async Task<HttpResponseMessage> Login(IUrlBase url, string username, string password, SsoLoginData loginData)
     {
         var encryptedPassword = Crypto.DesEncrypt(loginData.Crypto, password);
         //Console.WriteLine($"Encrypted Password: {encryptedPassword}");
-        
+
         var headers = new Dictionary<string, string>
         {
-            { "cookie",$"SESSION={loginData.Cookies[0].Value}" },
+            { "cookie", $"SESSION={loginData.Cookies[0].Value}" }
         };
         var data = new Dictionary<string, string>
         {
@@ -64,16 +60,16 @@ public class SsoApi
             { "croypto", loginData.Crypto },
             { "password", encryptedPassword },
             { "type", "UsernamePassword" },
-            { "_eventId","submit" },
-            { "geolocation","" }, 
-            { "execution",loginData.Execution }, 
-            { "captcha_code","" },
+            { "_eventId", "submit" },
+            { "geolocation", "" },
+            { "execution", loginData.Execution },
+            { "captcha_code", "" }
         };
         var httpContent = new FormUrlEncodedContent(data);
-        return await NetWorkClient.PostAsync(url.Sso,httpContent,headers);
+        return await NetWorkClient.PostAsync(url.Sso, httpContent, headers);
     }
 
-    public async Task<IEnumerable<string>> GetCookies(IUrlBase url,string username)
+    public async Task<IEnumerable<string>> GetCookies(IUrlBase url, string username)
     {
         Log.Info($"[{username}] Obtaining cookies part[1]");
         var response = await NetWorkClient.GetAsync(url.FirstCookie);
@@ -88,7 +84,8 @@ public class SsoApi
         return cookies;
     }
 
-    public async Task<string> GetCookiesAsString(IUrlBase url,string username) => string.Join(";", await GetCookies(url,username));
-    
-    
+    public async Task<string> GetCookiesAsString(IUrlBase url, string username)
+    {
+        return string.Join(";", await GetCookies(url, username));
+    }
 }

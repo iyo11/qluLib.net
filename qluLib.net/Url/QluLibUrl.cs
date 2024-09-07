@@ -5,10 +5,12 @@ namespace qluLib.net.Url;
 public class QluLibUrl : IUrlBase
 {
     public string Sso => "https://sso.qlu.edu.cn/login";
+
     public string Service =>
         "https://yuyue.lib.qlu.edu.cn/cas/index.php?callback=https://yuyue.lib.qlu.edu.cn/home/web/seat/area/1";
+
     public string FirstCookie =>
-        NetWorkClient.BuildUrl(Sso, new SortedDictionary<string, string>(){{"service", Service}});
+        NetWorkClient.BuildUrl(Sso, new SortedDictionary<string, string> { { "service", Service } });
 
     public string SecondCookie => "https://yuyue.lib.qlu.edu.cn/home/web/seat/area/1";
     public string TimeInfo => "https://yuyue.lib.qlu.edu.cn/api.php/areadays/1";

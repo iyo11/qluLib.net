@@ -36,22 +36,19 @@ public static class MailClient
     public static void SendEmailAnonymous(MailData data)
     {
         using var mail = new MailMessage();
-        foreach (var to in data.To)
-        {
-            mail.To.Add(to);
-        }
+        foreach (var to in data.To) mail.To.Add(to);
         mail.From = new MailAddress(data.FromAddress);
-        mail.Subject = data.Subject; 
-        mail.Body = data.Body; 
+        mail.Subject = data.Subject;
+        mail.Body = data.Body;
         mail.IsBodyHtml = data.IsBodyHtml;
         // 配置SMTP服务器
         using var smtp = new SmtpClient(data.Host);
         smtp.Port = data.Port;
         smtp.Credentials = new NetworkCredential(data.FromAddress, data.Password);
         smtp.EnableSsl = true;
-        smtp.EnableSsl = data.EnableSsl; 
+        smtp.EnableSsl = data.EnableSsl;
         smtp.Port = data.Port;
-        
+
         try
         {
             Log.Info($"Trying to send email [{data.Subject}]");
