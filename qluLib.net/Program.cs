@@ -15,7 +15,7 @@ var mailData = new MailData
     //smtp 生成密码
     Password = "", 
     //邮件接收地址
-    To = "iyo11@qq.com", //example@qq.com
+    To = ["example@qq.com","example1@qq.com"], //example@qq.com
     //启用ssl 默认启用
     EnableSsl = true,
     //smtp服务器

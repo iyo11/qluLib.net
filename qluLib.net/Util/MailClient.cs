@@ -5,7 +5,7 @@ namespace qluLib.net.Util;
 
 public class MailData
 {
-    public string To { get; set; }
+    public List<string> To { get; set; }
     public string Subject { get; set; }
     public string Body { get; set; }
     public string Host { get; set; }
@@ -36,7 +36,10 @@ public static class MailClient
     public static void SendEmailAnonymous(MailData data)
     {
         using var mail = new MailMessage();
-        mail.To.Add(data.To); 
+        foreach (var to in data.To)
+        {
+            mail.To.Add(to);
+        }
         mail.From = new MailAddress(data.FromAddress);
         mail.Subject = data.Subject; 
         mail.Body = data.Body; 
