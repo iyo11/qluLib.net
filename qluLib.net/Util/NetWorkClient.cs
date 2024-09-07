@@ -39,21 +39,16 @@ public static class NetWorkClient
             var response = await httpClient.GetAsync(uri);
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] Request failed with status code {response.StatusCode}.");
+                Log.Warn($"Request failed with status code {response.StatusCode}.");
                 return [];
             }
 
             var cookies = cookieContainer.GetCookies(uri).ToList();
             return cookies;
         }
-        catch (TimeoutException e)
-        {
-            Console.WriteLine($"{url} timed out");
-            Console.WriteLine(e.Message);
-        }
         catch (Exception e)
         {
-            Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] [GetCookiesException] {e}");
+            Log.Error($"[GetCookiesException] {e}");
         }
         return [];
     }
@@ -76,13 +71,13 @@ public static class NetWorkClient
             var response = await _httpClient.SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] Request failed with status code {response.StatusCode}.");
+                Log.Warn($"Request failed with status code {response.StatusCode}.");
             }
             return response;
         }
         catch (Exception e)
         {
-            Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] [GetException] {e}");
+            Log.Error($"[GetException] {e}");
             return null;
         }
     }
@@ -111,13 +106,13 @@ public static class NetWorkClient
            var response = await _httpClient.SendAsync(request);
            if (!response.IsSuccessStatusCode)
            {
-               Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] Request failed with status code {response.StatusCode}.");
+               Log.Warn($"Request failed with status code {response.StatusCode}.");
            }
            return response;
        }
        catch (Exception e)
        {
-           Console.WriteLine($"[{DateTime.Now}] [NetWorkClient] [PostException] {e}");
+           Log.Error($"[PostException] {e}");
            return null;
        }
     }
