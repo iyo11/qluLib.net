@@ -93,7 +93,7 @@ while (true)
             mailData.Subject = $"qluLib.net < Device:{Environment.MachineName}";
             mailData.Body = "预约通知服务开启";
             if (!MailClient.VerifyMailData(mailData))
-                Log.Warn("预约同时服务验证失败,将在1小时后重试");
+                Log.Warn("预约通知服务验证失败,将在1小时后重试");
             else
                 mailData.Verified = true;
         }

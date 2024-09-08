@@ -9,7 +9,6 @@ internal enum LogLevel
     Warn,
     Error,
     Fatal,
-    Minecraft
 }
 
 internal class LogMessage
@@ -33,7 +32,6 @@ public static class Log
             LogLevel.Info => ConsoleColor.White,
             LogLevel.Error => ConsoleColor.Red,
             LogLevel.Warn => ConsoleColor.DarkMagenta,
-            LogLevel.Minecraft => ConsoleColor.Blue,
             LogLevel.Fatal => ConsoleColor.DarkRed,
             _ => Console.ForegroundColor
         };
