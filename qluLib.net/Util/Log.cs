@@ -24,9 +24,6 @@ internal class LogMessage
 
 public static class Log
 {
-    private const string LogFile = "qluLib.net.log";
-    private static readonly StreamWriter Writer = new(LogFile);
-
     private static void WriteLogConsole(LogMessage logMessage)
     {
         var oldColor = Console.ForegroundColor;

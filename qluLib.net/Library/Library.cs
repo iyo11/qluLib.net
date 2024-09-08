@@ -42,7 +42,7 @@ public class Library
             postHeaders.Add("Origin", $"{uri.Scheme}://{uri.Host}");
             postHeaders["Referer"] = string.Format(url.Refer, (int)area, segment, day);
             var response = await NetWorkClient.PostAsync(postUrl, null, postHeaders);
-            var returnArgs = new string[] { userId, areaTime.ToString(), area.ToString(), seatId.ToString() };
+            var returnArgs = new[] { userId, areaTime.ToString(), area.ToString(), seatId.ToString() };
             if (response is null || !response.IsSuccessStatusCode) return new Tuple<string[], bool>(returnArgs, false);
             var obj = JObject.Parse(await response.Content.ReadAsStringAsync());
             var status = obj["status"] ?? "0";

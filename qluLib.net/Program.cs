@@ -69,12 +69,15 @@ while (true)
                     user.Cookies = (await sso.GetCookies(user.Username, user.Password, url)).ToList();
                 tasks.Add(library.Reserve(url, user.Cookies, user.AreaTime, user.Area, user.SeatId));
             }
+
             await Task.WhenAll(tasks);
             if (mailNotify)
                 foreach (var task in tasks.Where(task => task.IsCompletedSuccessfully))
                 {
                     mailData.Subject = $"{task.Result.Item1[0]} {task.Result.Item2}";
-                    mailData.Body = task.Result.Item2 ? $"{string.Join(" > ",task.Result.Item1)} 预约成功" : $"[{string.Join(" > ",task.Result.Item1)}] 预约失败";
+                    mailData.Body = task.Result.Item2
+                        ? $"{string.Join(" > ", task.Result.Item1)} 预约成功"
+                        : $"[{string.Join(" > ", task.Result.Item1)}] 预约失败";
                     MailClient.SendEmailAnonymous(mailData);
                 }
 
@@ -88,12 +91,13 @@ while (true)
         if (!mailData.Verified)
         {
             mailData.Subject = $"qluLib.net < Device:{Environment.MachineName}";
-            mailData.Body = $"预约通知服务开启";
+            mailData.Body = "预约通知服务开启";
             if (!MailClient.VerifyMailData(mailData))
                 Log.Warn("预约同时服务验证失败,将在1小时后重试");
             else
                 mailData.Verified = true;
         }
+
         foreach (var user in users)
         {
             if (!user.Verified)
@@ -109,16 +113,20 @@ while (true)
                     Log.Warn($"[{user.Username}] > 区域{user.Area}不存在座位{user.SeatId}");
                     continue;
                 }
+
                 var cookies = await sso.GetCookies(user.Username, user.Password, url);
                 if (!cookies.Any())
                 {
                     Log.Warn($"[{user.Username}] > 账号验证失败,将在1小时后重试");
                     continue;
                 }
+
                 user.Verified = true;
             }
+
             Log.Info($"[{user.Username}] [Listening..] {user.AreaTime} > {user.Area} > {user.SeatId}");
         }
     }
+
     Task.Delay(1000).Wait();
 }
