@@ -76,8 +76,8 @@ while (true)
                 {
                     mailData.Subject = $"{task.Result.Item1[0]} {task.Result.Item2}";
                     mailData.Body = task.Result.Item2
-                        ? $"{string.Join(" > ", task.Result.Item1)} 预约成功"
-                        : $"[{string.Join(" > ", task.Result.Item1)}] 预约失败";
+                        ? $"{string.Join(" > ", task.Result.Item1)} > 预约成功"
+                        : $"{string.Join(" > ", task.Result.Item1)} > 预约失败";
                     MailClient.SendEmailAnonymous(mailData);
                 }
 

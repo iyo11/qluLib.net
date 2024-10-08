@@ -13,7 +13,7 @@ public class Library
     }
 
     public async Task<Tuple<string[], bool>> Reserve(IUrlBase url, IEnumerable<string> cookies, AreaTime areaTime,
-        Area area, SeatId seatId)
+        Area area, SeatId seatId, int retryTimes = 10)
     {
         try
         {
@@ -41,18 +41,30 @@ public class Library
             var uri = new Uri(url.Reserve);
             postHeaders.Add("Origin", $"{uri.Scheme}://{uri.Host}");
             postHeaders["Referer"] = string.Format(url.Refer, (int)area, segment, day);
-            var response = await NetWorkClient.PostAsync(postUrl, null, postHeaders);
-            var returnArgs = new[] { userId, areaTime.ToString(), area.ToString(), seatId.ToString() };
-            if (response is null || !response.IsSuccessStatusCode) return new Tuple<string[], bool>(returnArgs, false);
-            var obj = JObject.Parse(await response.Content.ReadAsStringAsync());
-            var status = obj["status"] ?? "0";
-            var message = obj["msg"] ?? "";
-            if (status?.ToString() == "1")
-            {
-                Log.Info($"[{userId}] {message.ToString().Replace("<br/>", "\n")}");
-                return new Tuple<string[], bool>(returnArgs, true);
-            }
+            
+                        
+            var tryCount = 0;
+            string[] returnArgs = [];
+            JToken message = null;
 
+            while (tryCount < retryTimes)
+            {
+                var response = await NetWorkClient.PostAsync(postUrl, null, postHeaders);
+
+                if (response is null || !response.IsSuccessStatusCode) 
+                    continue;
+                var obj = JObject.Parse(await response.Content.ReadAsStringAsync());
+                var status = obj["status"] ?? "0";
+                message = obj["msg"] ?? "";
+                returnArgs = [userId, areaTime.ToString(), area.ToString(), seatId.ToString(), message.ToString().Replace("<br/>", "\n")];
+                if (status?.ToString() == "1")
+                {
+                    Log.Info($"[{userId}] {message.ToString().Replace("<br/>", "\n")}");
+                    return new Tuple<string[], bool>(returnArgs, true);
+                }
+                Log.Warn($" [{userId}] 预约中 重试次数[{tryCount}]\n{message}");
+                tryCount++;
+            }
             Log.Warn($" [{userId}] 预约失败\n{message}");
             return new Tuple<string[], bool>(returnArgs, false);
         }

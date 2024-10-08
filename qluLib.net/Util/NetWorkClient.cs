@@ -86,7 +86,6 @@ public static class NetWorkClient
         Dictionary<string, string> headers = null)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, url);
-        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         if (headers is not null)
             foreach (var keyValuePair in headers)
                 request.Headers.Add(keyValuePair.Key, keyValuePair.Value);
