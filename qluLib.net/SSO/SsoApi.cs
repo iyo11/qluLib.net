@@ -23,7 +23,7 @@ public class SsoApi
         var cookieContainer = new CookieContainer();
         var socketsHttpHandler = new SocketsHttpHandler
         {
-            ConnectTimeout = TimeSpan.FromSeconds(3),
+            ConnectTimeout = TimeSpan.FromSeconds(30),
             CookieContainer = cookieContainer
         };
         var httpClient = new HttpClient(socketsHttpHandler);
@@ -47,7 +47,7 @@ public class SsoApi
 
     public async Task<HttpResponseMessage> Login(IUrlBase url, string username, string password, SsoLoginData loginData)
     {
-        var encryptedPassword = Crypto.DesEncrypt(loginData.Crypto, password);
+        var encryptedPassword = Crypto.AesEncrypt(loginData.Crypto, password);
         //Console.WriteLine($"Encrypted Password: {encryptedPassword}");
 
         var headers = new Dictionary<string, string>

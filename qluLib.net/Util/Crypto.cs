@@ -17,4 +17,18 @@ public static class Crypto
         var encryptedBytes = encryptor.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
         return Convert.ToBase64String(encryptedBytes);
     }
+    
+    public static string AesEncrypt(string keyBase64, string data)
+    {
+        var keyBytes = Convert.FromBase64String(keyBase64);
+        var dataBytes = Encoding.UTF8.GetBytes(data);
+        using var aes = Aes.Create();
+        aes.Key = keyBytes;
+        aes.Mode = CipherMode.ECB;
+        aes.Padding = PaddingMode.PKCS7;
+        using var encryptor = aes.CreateEncryptor();
+        var encryptedBytes = encryptor.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
+        return Convert.ToBase64String(encryptedBytes);
+    }
+    
 }
